@@ -1,0 +1,100 @@
+name: hpct-cluster-bundle-mockup
+
+description: |
+  HPC cluster mockup using hpct-node and hpct-subordinate-node
+  operators.
+
+#variables:
+
+series: jammy
+
+#tags:
+
+applications:
+  head:
+    #charm: hpct-node
+    charm: ./hpct-node_ubuntu-22.04-amd64.charm
+    series: jammy
+    num_units: 1
+    #constraints: cores=2 mem=4G
+
+  interactive:
+    #charm: hpct-node
+    charm: ./hpct-node_ubuntu-22.04-amd64.charm
+    series: jammy
+    num_units: 2
+    #constraints: cores=2 mem=4G
+
+  service-ldap:
+    #charm: hpct-node
+    charm: ./hpct-node_ubuntu-22.04-amd64.charm
+    series: jammy
+    num_units: 1
+    #constraints: cores=2 mem=4G
+
+  service-slurm:
+    #charm: hpct-node
+    charm: ./hpct-node_ubuntu-22.04-amd64.charm
+    series: jammy
+    num_units: 1
+    #constraints: cores=2 mem=4G
+
+  compute:
+    #charm: hpct-node
+    charm: ./hpct-node_ubuntu-22.04-amd64.charm
+    series: jammy
+    num_units: 2
+    #constraints: cores=2 mem=8G
+
+  #
+  # subordinates
+  #
+
+  ldap-client:
+    #charm: hpct-node-subordinate
+    charm: ./hpct-node-subordinate_ubuntu-22.04-amd64.charm
+    series: jammy
+
+  ldap-server:
+    #charm: hpct-node-subordinate
+    charm: ./hpct-node-subordinate_ubuntu-22.04-amd64.charm
+    series: jammy
+
+  slurm-client:
+    #charm: hpct-node-subordinate
+    charm: ./hpct-node-subordinate_ubuntu-22.04-amd64.charm
+    series: jammy
+
+  slurm-server:
+    #charm: hpct-node-subordinate
+    charm: ./hpct-node-subordinate_ubuntu-22.04-amd64.charm
+    series: jammy
+
+relations:
+# head
+- - head:node
+  - ldap-client:node
+- - head:node
+  - slurm-client:node
+
+# interactive
+- - interactive:node
+  - ldap-client:node
+- - interactive:node
+  - slurm-client:node
+
+# ldap
+- - service-ldap:node
+  - ldap-server:node
+
+# slurm
+- - service-slurm:node
+  - ldap-client:node
+- - service-slurm:node
+  - slurm-server:node
+
+# compute
+- - compute:node
+  - ldap-client:node
+- - compute:node
+  - slurm-client:node
